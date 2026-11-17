@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q-RITE · Sites</title>
+<link rel="stylesheet" href="vendor/leaflet.css">
+<style>
+:root{
+ --bg:#05080d;--panel:#0b1219;--line:#1d2b3a;--line2:#27394c;
+ --ink:#dce8f4;--muted:#8ba0b4;--dim:#5d7186;
+ --cyan:#39d0ff;--amber:#ffb454;--red:#ff5b4a;--green:#3ee08f;--violet:#a98bff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+ font:13.5px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif}
+body{display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);
+ background:linear-gradient(180deg,rgba(11,18,25,.97),rgba(6,10,15,.9));z-index:1100}
+.brand{font-weight:800;font-size:17px;letter-spacing:2.2px}
+.brand em{font-style:normal;color:var(--cyan)}
+.tag{font-size:10px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase}
+.spacer{flex:1}
+.btn{border:1px solid var(--line2);border-radius:7px;padding:5px 11px;font-size:12px;color:var(--muted)}
+.btn:hover{border-color:#3a5a70;color:var(--ink)}
+.btn.on{background:var(--cyan);color:#04121a;border-color:var(--cyan);font-weight:700}
+.btn.primary{border-color:#1f5e74;color:#bfeeff;background:#07202a}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+#btnLang{min-width:52px}
+main{display:grid;grid-template-columns:296px 1fr 340px;flex:1;min-height:0}
+aside{border-right:1px solid var(--line);padding:12px;overflow-y:auto;background:#070d13}
+aside.right{border-right:0;border-left:1px solid var(--line)}
+h4{margin:2px 0 8px;font-size:10px;letter-spacing:1.3px;color:var(--dim);text-transform:uppercase}
+h3{margin:14px 0 6px;font-size:12px;letter-spacing:.4px;color:#cfe2f2}
+.site{display:block;width:100%;text-align:left;padding:9px 10px;border-radius:9px;
+ border:1px solid var(--line);background:#0a141d;margin-bottom:7px}
+.site:hover{border-color:#2a5b74;background:#0d1c26}
+.site.on{border-color:var(--cyan);background:linear-gradient(90deg,#0f2a3a,#0b1822)}
+.site b{display:block;font-size:13px;color:#eaf7ff}
+.site small{display:block;font-size:10.5px;color:var(--dim)}
+.site .nums{display:flex;gap:8px;margin-top:4px;font-size:10px;color:#7f95a9}
+.site .nums i{font-style:normal;color:#9fd8ef}
+#map{width:100%;height:100%;background:#0a1017;touch-action:none}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:6px 0 2px}
+.kpi{border:1px solid var(--line);border-radius:8px;padding:7px 8px;background:#0a141d}
+.kpi b{display:block;font-size:17px;color:#eaf6ff;line-height:1.25}
+.kpi span{font-size:10px;color:var(--dim)}
+.hint{font-size:10.5px;color:#7f95a9;border:1px dashed #22384a;border-radius:8px;padding:7px 8px;background:#08131b;margin-top:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{font-weight:600;color:var(--dim);font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;
+ text-align:left;padding:5px 4px;border-bottom:1px solid var(--line2)}
+.tbl td{padding:4px;border-bottom:1px solid #101d28;color:#b9cddd;white-space:nowrap}
+.tbl tr.rec td{color:#c8ffe4}
+.badge{font-size:9.5px;padding:1px 5px;border-radius:9px;border:1px solid #2a4a60;color:#8fd8f0}
+.lchip{display:inline-block;width:15px;height:3px;border-radius:2px;vertical-align:middle;
+ margin-right:5px;box-shadow:0 0 0 1px rgba(0,0,0,.6)}
+.same{font-size:9px;color:#5d7186;border:1px solid #1d2b3a;border-radius:8px;padding:0 4px}
+.sel{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--dim)}
+.sel select{background:#0a141d;color:#cfe2f2;border:1px solid var(--line2);border-radius:6px;
+ padding:3px 5px;font:inherit;font-size:11px}
+.tbl tr.over td{color:#5d7186}
+.legend{display:flex;flex-wrap:wrap;gap:9px;font-size:10.5px;color:var(--dim);margin-top:8px}
+.pill{display:inline-flex;gap:6px;align-items:center;font-size:10.5px;color:var(--dim)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.leaflet-container{background:#0a1017;font:inherit}
+.leaflet-control-attribution{background:rgba(8,15,22,.8)!important;color:#6f8497!important;font-size:9.5px!important}
+.leaflet-bar a{background:#0d1a24!important;color:#cfe2f2!important;border-color:#20323f!important}
+#toast{position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:3000;display:flex;
+ flex-direction:column;gap:6px;align-items:center;pointer-events:none}
+.msg{background:#0e1c27;border:1px solid #2a4a60;color:#cfe9f7;font-size:12px;padding:7px 13px;border-radius:8px}
+.msg.err{border-color:#7a2a22;background:#2a0d0d;color:#ffb3aa}
+.msg.ok{border-color:#2b6b52;color:#a8f0c8}
+.spin{width:11px;height:11px;border:1.6px solid #2a4a60;border-top-color:var(--cyan);border-radius:50%;
+ display:inline-block;animation:sp .8s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.sect{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+/* figure mode: ?shot=1 drops the chrome a printed figure does not need */
+body.shot #btnLang{display:none}
+body.shot main{grid-template-columns:1fr 360px}
+body.shot main>aside:first-child{display:none}
+body.shot #map{grid-column:1}
+body.shot aside.right{grid-column:2}
+body.shot .hint{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Q-<em>RITE</em> <span class="tag">sites</span></div>
+  <span class="pill"><span class="dot" style="background:var(--cyan)"></span>
+    <span data-zh="五个预设窗口 · 约 2.5 km" data-en="five preset windows, ~2.5 km">五个预设窗口 · 约 2.5 km</span></span>
+  <div class="spacer"></div>
+  <button class="btn" id="btnLang">EN</button>
+</header>
+
+<main>
+  <aside>
+    <h4 data-zh="选择地块" data-en="Pick a site">选择地块</h4>
+    <div id="list"></div>
+    <div class="hint" id="listNote" data-zh="井口、井链与路网为构建期预计算，离线可用。"
+         data-en="Shafts, rows and roads are precomputed at build time; the page runs offline."></div>
+
+    <div class="sect">
+      <h4 data-zh="图例" data-en="Layers">图例</h4>
+      <div class="legend">
+        <span class="pill"><span class="dot" style="background:#7bf0b4"></span><span data-zh="链上井口" data-en="shaft on a row">链上井口</span></span>
+        <span class="pill"><span class="dot" style="background:#ffb454"></span><span data-zh="孤立井口" data-en="isolated">孤立井口</span></span>
+        <span class="pill"><span class="dot" style="background:#3ee08f"></span><span data-zh="井链 A 级" data-en="row, grade A">井链 A 级</span></span>
+        <span class="pill"><span class="dot" style="background:#3ee08f;opacity:.75"></span><span data-zh="B 级" data-en="grade B">B 级</span></span>
+        <span class="pill"><span class="dot" style="background:#3ee08f;opacity:.5"></span><span data-zh="C 级" data-en="grade C">C 级</span></span>
+        <span class="pill"><span class="dot" style="background:#4abeff"></span><span data-zh="铺装路" data-en="paved">铺装路</span></span>
+        <span class="pill"><span class="dot" style="background:#79d6c6"></span><span data-zh="土路" data-en="dirt">土路</span></span>
+        <span class="pill"><span class="dot" style="background:#ff5b4a"></span><span data-zh="交叉" data-en="crossing">交叉</span></span>
+        <span class="pill"><span class="dot" style="background:#a98bff"></span><span data-zh="预选线" data-en="corridor">预选线</span></span>
+      </div>
+      <div class="hint" style="margin-top:6px" data-zh="井口与井链为本研究区检出结果，按窗口边界裁剪；边界由数据范围确定。"
+           data-en="Shafts and rows are the detected set for this study area, clipped to the window; bounds follow the data extent."></div>
+    </div>
+  </aside>
+
+  <div id="map"></div>
+
+  <aside class="right">
+    <h4 id="siteName" data-zh="结果" data-en="Results">结果</h4>
+    <div id="siteNote" class="hint" data-zh="从左侧选一块。" data-en="Pick a site on the left."></div>
+
+    <div class="kpis">
+      <div class="kpi"><b id="kShaft">—</b><span data-zh="井口" data-en="shafts">井口</span></div>
+      <div class="kpi"><b id="kRow">—</b><span data-zh="井链" data-en="rows">井链</span></div>
+      <div class="kpi"><b id="kRoad">—</b><span data-zh="道路" data-en="roads">道路</span></div>
+      <div class="kpi"><b id="kCross">—</b><span data-zh="交叉" data-en="crossings">交叉</span></div>
+    </div>
+
+    <div class="sect" id="corrSect">
+      <h3 data-zh="预选线（唯一的交互）" data-en="Corridor (the only interactive part)">预选线（唯一的交互）</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0">
+        <button class="btn primary" id="btnPick" data-zh="点选端点" data-en="Pick endpoints">点选端点</button>
+        <button class="btn" id="btnOpt" data-zh="方案优化" data-en="Optimise" disabled>方案优化</button>
+        <button class="btn" id="btnClear" data-zh="清空" data-en="Clear">清空</button>
+        <label class="sel"><span data-zh="绕行上限" data-en="detour cap">绕行上限</span>
+          <select id="selBudget">
+            <option value="0.05">≤ 5%</option>
+            <option value="0.10" selected>≤ 10%</option>
+            <option value="0.20">≤ 20%</option>
+            <option value="9">—</option>
+          </select></label>
+      </div>
+      <div class="hint" id="hint" data-zh="点「点选端点」，在地图上依次点 2 个点，再点「方案优化」。"
+           data-en="Hit “Pick endpoints”, click two points on the map, then “Optimise”."></div>
+      <div class="tbl-wrap"><table class="tbl" id="tRoute"></table></div>
+      <div class="hint" id="routeNote" hidden></div>
+    </div>
+
+    <div class="sect">
+      <h3 data-zh="交叉事件" data-en="Crossings">交叉事件</h3>
+      <div class="tbl-wrap"><table class="tbl" id="tCross"></table></div>
+    </div>
+  </aside>
+</main>
+
+<div id="toast"></div>
+<script src="vendor/leaflet.js"></script>
+<script src="sites/data.js"></script>
+<script src="router.js"></script>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const Q=new URLSearchParams(location.search);
+let LANG=(Q.get('lang')||localStorage.getItem('qrite.lang')||'en').toLowerCase()==='en'?'en':'zh';
+const T=(zh,en)=>LANG==='en'?en:zh;
+const msg=(text,kind='',ms=4200)=>{const d=document.createElement('div');d.className='msg '+kind;
+  d.textContent=text;$('toast').appendChild(d);setTimeout(()=>d.remove(),ms);};
+
+const map=L.map('map',{zoomControl:true,attributionControl:true,preferCanvas:true})
+  .setView([42.92,89.26],13);
+const lay={img:L.layerGroup().addTo(map),roads:L.layerGroup().addTo(map),
+  rows:L.layerGroup().addTo(map),shafts:L.layerGroup().addTo(map),
+  cross:L.layerGroup().addTo(map),corr:L.layerGroup().addTo(map)};
+
+const S={site:null,index:[],wps:[],mode:'idle',routes:[]};
+
+/* ---------- list ---------- */
+async function loadIndex(){
+  /* offline build: the bundles ship as a <script>, because fetch() is blocked
+     on file:// and the point of this copy is that it opens by double-click */
+  S.index=window.QSITES.index;
+  $('list').innerHTML=S.index.map((s,i)=>`
+    <button class="site" data-i="${i}">
+      <b>${LANG==='en'?s.name_en:s.name}</b>
+      <small>${LANG==='en'?s.note_en:s.note}</small>
+      <span class="nums">
+        <span>${s.stats.shafts} <i>${T('井口','shafts')}</i></span>
+        <span>${s.stats.rows} <i>${T('链','rows')}</i></span>
+        <span>${s.stats.roads} <i>${T('路','roads')}</i></span>
+      </span>
+    </button>`).join('');
+  [...document.querySelectorAll('.site')].forEach(b=>{
+    b.onclick=()=>openSite(+b.dataset.i);
+  });
+}
+
+/* ---------- open a site ---------- */
+async function openSite(i){
+  const meta=S.index[i];
+  [...document.querySelectorAll('.site')].forEach(b=>b.classList.toggle('on',+b.dataset.i===i));
+  $('siteNote').innerHTML='<span class="spin"></span> '+T('载入影像与矢量…','loading imagery and vectors…');
+  const s=window.QSITES.sites[meta.id];
+  S.site=s; S.wps=[]; S.routes=[]; S.mode='idle';
+  paint(s);
+  const b=L.latLngBounds([s.bbox[1],s.bbox[0]],[s.bbox[3],s.bbox[2]]);
+  map.fitBounds(b,{padding:[6,6]});
+  $('siteNote').textContent=LANG==='en'?s.note_en:s.note;
+  $('siteName').textContent=LANG==='en'?s.name_en:s.name;
+  refresh();
+}
+
+/* Liang-Barsky: a way that leaves the site box must stop at the edge, not run
+   on across the neighbouring tiles */
+function clipSeg(p0,p1,box){
+  const [xmin,ymin,xmax,ymax]=box;
+  const dx=p1[0]-p0[0], dy=p1[1]-p0[1];
+  const pp=[-dx,dx,-dy,dy], qq=[p0[0]-xmin,xmax-p0[0],p0[1]-ymin,ymax-p0[1]];
+  let t0=0,t1=1;
+  for(let i=0;i<4;i++){
+    if(pp[i]===0){ if(qq[i]<0)return null; }
+    else{
+      const r=qq[i]/pp[i];
+      if(pp[i]<0){ if(r>t1)return null; if(r>t0)t0=r; }
+      else{ if(r<t0)return null; if(r<t1)t1=r; }
+    }
+  }
+  return [[p0[0]+t0*dx,p0[1]+t0*dy],[p0[0]+t1*dx,p0[1]+t1*dy]];
+}
+
+function clipLine(pts,box){
+  const out=[]; let cur=[];
+  for(let i=0;i<pts.length-1;i++){
+    const seg=clipSeg(pts[i],pts[i+1],box);
+    if(!seg){ if(cur.length>1)out.push(cur); cur=[]; continue; }
+    if(!cur.length)cur=[seg[0]];
+    cur.push(seg[1]);
+    const e=pts[i+1];
+    if(Math.abs(seg[1][0]-e[0])>1e-9||Math.abs(seg[1][1]-e[1])>1e-9){
+      if(cur.length>1)out.push(cur);
+      cur=[];
+    }
+  }
+  if(cur.length>1)out.push(cur);
+  return out;
+}
+
+function paint(s){
+  Object.values(lay).forEach(g=>g.clearLayers());
+  const b=[[s.bbox[1],s.bbox[0]],[s.bbox[3],s.bbox[2]]];
+  L.imageOverlay('sites/'+s.img,b,{opacity:1,attribution:'Imagery © Microsoft Bing · Roads © OpenStreetMap contributors (ODbL)'}).addTo(lay.img);
+
+  const box=s.bbox;
+  s.roads.forEach(w=>{
+    const st=w.paved?{color:'#4abeff',weight:1.5,opacity:.62}
+                    :{color:'#79d6c6',weight:1.1,opacity:.55,dashArray:'5 4'};
+    clipLine(w.pts,box).forEach(seg=>
+      L.polyline(seg.map(p=>[p[1],p[0]]),st)
+        .bindTooltip(`${w.cls} · ${w.w} m · ${w.paved?T('铺装','paved'):T('土路','dirt')}`,
+                     {sticky:true}).addTo(lay.roads));
+  });
+  s.rows.forEach((row,i)=>{
+    clipLine(row.lonlat,box).forEach(seg=>{
+      const pts=seg.map(p=>[p[1],p[0]]);
+      /* grade A/B/C changes the stroke, not the colour: the row layer has to
+         stay one object on the map, and the grade is a statement about how much
+         evidence supports it, not about what it is */
+      const g=row.grade||'C';
+      const ST={A:{w:2.8,o:1,dash:null},B:{w:2.0,o:.95,dash:null},
+                C:{w:1.5,o:.8,dash:'5 4'}}[g]||{w:1.5,o:.8,dash:'5 4'};
+      L.polyline(pts,{color:'#06240f',weight:ST.w+2.4,opacity:.45}).addTo(lay.rows);
+      L.polyline(pts,{color:'#3ee08f',weight:ST.w,opacity:ST.o,dashArray:ST.dash})
+        .bindTooltip(T(`链 ${i+1} · ${g} 级 · ${row.n} 口 · ${row.length} m · 井距 ${row.spacing} m`,
+                       `row ${i+1} · grade ${g} · ${row.n} mouths · ${row.length} m · spacing ${row.spacing} m`),
+                     {sticky:true}).addTo(lay.rows);
+    });
+  });
+  s.shafts.forEach(p=>{
+    const on=p[2]===1;
+    L.circleMarker([p[1],p[0]],on
+      ?{radius:2.4,color:'#05301b',weight:.6,fillColor:'#7bf0b4',fillOpacity:1}
+      :{radius:1.9,color:'#3a2208',weight:.5,fillColor:'#ffb454',fillOpacity:.9}).addTo(lay.shafts);
+  });
+  s.crossings.forEach((c,i)=>{
+    L.circleMarker([c.lat,c.lon],{radius:5,color:'#ff5b4a',weight:2,fillColor:'#2a0d0d',fillOpacity:.9})
+      .bindTooltip(T(`交叉 ${i+1} · ${c.cls} · α ${c.alpha}° · L ${c.L} m`,
+                     `crossing ${i+1} · ${c.cls} · α ${c.alpha}° · L ${c.L} m`),{sticky:true})
+      .addTo(lay.cross);
+  });
+  $('kShaft').textContent=s.stats.shafts;
+  $('kRow').textContent=s.stats.rows;
+  $('kRoad').textContent=s.stats.roads;
+  $('kCross').textContent=s.stats.crossings;
+  $('tCross').innerHTML='<thead><tr><th>#</th><th>'+T('道路','road')+'</th><th style="text-transform:none">α°</th><th>L m</th><th>'+
+    T('井口 N','mouths')+'</th></tr></thead><tbody>'+
+    (s.crossings.length?s.crossings.map((c,i)=>`<tr><td>${i+1}</td><td>${c.cls}</td>`+
+      `<td>${c.alpha}</td><td>${c.L}</td><td>${c.mouths}</td></tr>`).join('')
+     :'<tr><td colspan="5" style="color:#5d7186">'+T('本块既有道路没有穿过井链','no existing road crosses a row here')+'</td></tr>')+
+    '</tbody>';
+}
+
+/* ---------- corridor: the only interaction left ---------- */
+function setMode(m){S.mode=m;$('btnPick').classList.toggle('on',m==='pick');
+  map.getContainer().style.cursor=m==='pick'?'crosshair':'';}
+
+map.on('click',e=>{
+  if(S.mode!=='pick'||!S.site)return;
+  S.wps.push([e.latlng.lng,e.latlng.lat]);
+  drawWps();
+  $('btnOpt').disabled=S.wps.length<2;
+  hint(T(`已选 ${S.wps.length} 个端点。`,'') + (S.wps.length<2
+    ? T('再点一个。','click one more.')
+    : T('可以点「方案优化」。','hit “Optimise”.')));
+});
+
+function drawWps(){
+  lay.corr.clearLayers();
+  S.wps.forEach((p,i)=>L.circleMarker([p[1],p[0]],
+    {radius:6,color:'#a98bff',weight:2,fillColor:'#1a1226',fillOpacity:.9}).addTo(lay.corr));
+  if(S.wps.length>=2)L.polyline(S.wps.map(p=>[p[1],p[0]]),
+    {color:'#a98bff',weight:2,dashArray:'5 5',opacity:.9}).addTo(lay.corr);
+}
+
+async function optimise(){
+  if(!S.site||S.wps.length<2)return;
+  hint('<span class="spin"></span> '+T('正在搜索线位…','searching alignments…'));
+  /* let the hint paint before the synchronous search blocks the thread */
+  await new Promise(r=>setTimeout(r,30));
+  try{
+    S.routes=planRouteLocal(S.wps,S.site);
+    paintRoutes();
+  }catch(e){
+    hint(T('优化失败：','Optimisation failed: ')+e.message);
+  }
+}
+
+/* One colour per option, a dark casing under every line so it reads against
+   the imagery, and a chip in the table carrying the same colour. Two lambdas
+   often land on the same geometry once the grid is coarse; that line is drawn
+   once and the later rows say so, instead of stacking invisible copies. */
+const RCOL={straight:'#cfd9e4',avoid:'#22d3ee',best:'#ffb454'};
+const LSERIES=['#a3e635','#f472b6','#c084fc','#e879f9'];
+
+/* arc-length resampling, in metres, so two paths with different vertex spacing
+   can still be compared */
+function _resampleM(ll,n){
+  const m=ll.length, seg=[], cum=[0];
+  for(let i=0;i<m-1;i++){
+    const dx=(ll[i+1][0]-ll[i][0])*111320*Math.cos(ll[i][1]*Math.PI/180);
+    const dy=(ll[i+1][1]-ll[i][1])*110950;
+    seg.push(Math.hypot(dx,dy)); cum.push(cum[i]+seg[i]);
+  }
+  const tot=cum[cum.length-1]||1, out=[];
+  for(let j=0;j<n;j++){
+    const t=tot*j/(n-1);
+    let i=0; while(i<m-2 && cum[i+1]<t)i++;
+    const f=seg[i]?(t-cum[i])/seg[i]:0;
+    out.push([ll[i][0]+(ll[i+1][0]-ll[i][0])*f, ll[i][1]+(ll[i+1][1]-ll[i][1])*f]);
+  }
+  return out;
+}
+
+function sameLine(a,b){
+  if(!a.length||!b.length)return false;
+  const A=_resampleM(a,24), B=_resampleM(b,24);
+  let mx=0;
+  for(let i=0;i<A.length;i++){
+    const dx=(A[i][0]-B[i][0])*111320*Math.cos(A[i][1]*Math.PI/180);
+    const dy=(A[i][1]-B[i][1])*110950;
+    mx=Math.max(mx,Math.hypot(dx,dy));
+  }
+  return mx<40;                 // two corridors closer than 40 m read as one line
+}
+
+/* the reader sets how much detour is affordable; the page then answers the
+   only question that matters inside that limit - which line loads least */
+function pickBest(cs){
+  const b0=cs.find(c=>c.kind==='straight');
+  const L0=b0?b0.length_km:cs[0].length_km;
+  const cap=S.budget;
+  cs.forEach(c=>{
+    c._over = c.kind!=='straight' && c.length_km>S.budgetLen(L0);
+    c._best = false;
+  });
+  const ok=cs.filter(c=>c.kind!=='straight'&&!c._over);
+  const best=ok.slice().sort((a,b)=>a.cavity_km-b.cavity_km||a.length_km-b.length_km)[0];
+  if(best)best._best=true;
+  return {L0,best};
+}
+
+function styleFor(cs){
+  pickBest(cs);
+  let k=0;
+  cs.forEach(c=>{
+    if(c.kind==='straight') c._col=RCOL.straight;
+    else if(c._best)        c._col=RCOL.best;
+    else if(c.kind==='avoid') c._col=RCOL.avoid;
+    else                    c._col=LSERIES[k++%LSERIES.length];
+    c._dash=c.kind==='straight'?'10 7':null;
+    c._w=c._best?4.6:(c.kind==='avoid'?3.2:2.6);
+  });
+}
+
+function paintRoutes(){
+  lay.corr.clearLayers();
+  drawWps();
+  const cs=S.routes;
+  pickBest(cs);
+
+  /* 1. one line per distinct geometry: the reference first, the best last */
+  const order=cs.map((c,i)=>i).sort((a,b)=>{
+    const key=c=>c.kind==='straight'?0:(c._best?3:(c.kind==='avoid'?1:2));
+    return key(cs[a])-key(cs[b]) || (cs[a].lam||0)-(cs[b].lam||0);
+  });
+  const rep=new Array(cs.length).fill(-1);
+  const uniq=[];
+  order.forEach(i=>{
+    const hit=uniq.find(j=>sameLine(cs[j].lonlat,cs[i].lonlat));
+    if(hit===undefined||hit<0){ rep[i]=i; uniq.push(i); }
+    else rep[i]=hit;
+  });
+
+  /* 2. colours are handed out per drawn line, so two options that share a
+        geometry can never wear two different colours; if the recommended one
+        shares its line with another row, the drawn line is still the amber one */
+  const bestIdx=cs.findIndex(c=>c._best);
+  const isBestLine=i=>bestIdx>=0&&(i===bestIdx||rep[bestIdx]===i);
+  let k=0;
+  uniq.forEach(i=>{
+    const c=cs[i], best=isBestLine(i);
+    if(c.kind==='straight')     c._col=RCOL.straight;
+    else if(best)               c._col=RCOL.best;
+    else if(c.kind==='avoid')   c._col=RCOL.avoid;
+    else                        c._col=LSERIES[k++%LSERIES.length];
+    c._dash=c.kind==='straight'?'10 7':null;
+    c._w=best?4.6:(c.kind==='avoid'?3.2:2.6);
+  });
+  cs.forEach((c,i)=>{ if(rep[i]!==i&&rep[i]>=0)c._col=cs[rep[i]]._col; });
+
+  /* 3. draw */
+  uniq.forEach(i=>{
+    const c=cs[i];
+    const ang=c.alpha_min?` · α≥${c.alpha_min}°`:'';
+    clipLine(c.lonlat,S.site.bbox).forEach(seg=>{
+      const pts=seg.map(p=>[p[1],p[0]]);
+      L.polyline(pts,{color:'#04070c',weight:c._w+4,opacity:.55}).addTo(lay.corr);
+      L.polyline(pts,{color:c._col,weight:c._w,opacity:c._best?1:.92,dashArray:c._dash})
+        .bindTooltip(`${c.kind==='straight'?T('直线（参照）','straight reference')
+          :c.kind==='avoid'?T('完全避让','avoid all'):'λ='+c.lam}`+
+          ` · ${c.length_km.toFixed(3)} km · ${T('压住','loaded')} ${(c.cavity_km*1000).toFixed(0)} m`+
+          ` · ${c.crossings} ${T('处交叉','crossings')}${ang}`,{sticky:true})
+        .addTo(lay.corr);
+    });
+  });
+
+  /* 4. table */
+  const label=c=>c.kind==='straight'?T('直线','straight')
+    :c.kind==='avoid'?T('完全避让','avoid all')
+    :(c._best?'<b>λ='+c.lam+'</b>':'λ='+c.lam);
+  const chip=i=>`<i class="lchip" style="background:${cs[i]._col}"></i>`;
+  $('tRoute').innerHTML='<thead><tr><th>'+T('方案','option')+'</th><th>'+T('长度 km','km')+'</th><th>'+
+    T('压住 m','loaded')+'</th><th>'+T('交叉','cross')+'</th><th style="text-transform:none">'+T('夹角','α')+'</th></tr></thead><tbody>'+
+    cs.map((c,i)=>`<tr class="${c._best?'rec':''}${c._over?' over':''}">`+
+      `<td>${chip(rep[i]<0?i:rep[i])}${label(c)}`+
+      `${c._best?' <span class="badge">'+T('推荐','best')+'</span>':''}`+
+      `${rep[i]>=0&&rep[i]!==i?'<span class="same">'+T('同线位','same line')+'</span>':''}`+
+      `${c._over?' <span class="same">'+T('超预算','over cap')+'</span>':''}</td>`+
+      `<td>${c.length_km.toFixed(3)}</td><td>${(c.cavity_km*1000).toFixed(0)}</td>`+
+      `<td>${c.crossings}</td><td>${c.alpha_min?c.alpha_min+'°':'—'}</td></tr>`).join('')+'</tbody>';
+
+  /* 5. what the reader just read */
+  const b0=cs.find(c=>c.kind==='straight');
+  const best=cs.find(c=>c._best);
+  const capTxt=S.budget>=1?T('不限绕行','no cap'):T(`绕行 ≤${(S.budget*100).toFixed(0)}%`,`detour ≤${(S.budget*100).toFixed(0)}%`);
+  $('routeNote').hidden=false;
+  if(best&&b0){
+    const dl=((best.length_km/b0.length_km-1)*100).toFixed(0);
+    const bn=best.kind==='avoid'?T('完全避让','avoid all'):'λ='+best.lam;
+    $('routeNote').textContent=T(
+      `${capTxt} 内推荐 ${bn}：长度 +${dl}%，压住 ${b0.cavity_km.toFixed(3)} → ${best.cavity_km.toFixed(3)} km。`,
+      `Within ${capTxt.toLowerCase()}, best is ${bn}: ${dl}% longer, loaded ${b0.cavity_km.toFixed(3)} → ${best.cavity_km.toFixed(3)} km.`);
+  }else if(b0&&b0.cavity_km<0.005){
+    $('routeNote').textContent=T('直线未与井链相交，无绕行必要；请选一对跨越井列的端点。',
+      'The straight line meets no row, so a detour cannot help; choose endpoints that cross the rows.');
+  }else{
+    const near=cs.filter(c=>c.kind!=='straight').sort((a,b)=>a.length_km-b.length_km)[0];
+    const gap=near?((near.length_km/b0.length_km-1)*100).toFixed(0):'—';
+    $('routeNote').textContent=T(
+      `${capTxt} 内没有能避开井链的线位；最短的避让方案要绕 ${gap}%。把上限放宽，或挪动端点。`,
+      `No alignment avoids a row within ${capTxt.toLowerCase()}; the shortest detour is ${gap}%. Raise the cap or move the endpoints.`);
+  }
+  hint(T('方案已画出。改上限或端点可重新比选。','Options drawn. Change the cap or the endpoints to compare again.'));
+}
+
+function hint(t){$('hint').innerHTML=t;}
+function refresh(){
+  $('btnOpt').disabled=S.wps.length<2;
+  $('tRoute').innerHTML='<thead><tr><th>'+T('方案','option')+'</th></tr></thead>'+
+    '<tbody><tr><td style="color:#5d7186">'+T('还没有方案','no options yet')+'</td></tr></tbody>';
+  $('routeNote').hidden=true;
+}
+
+$('btnPick').onclick=()=>{setMode('pick');
+  hint(T('在地图上依次点 2 个端点（起点、终点）。','Click the start and end points on the map.'));};
+$('btnOpt').onclick=()=>optimise();
+$('selBudget').onchange=e=>{
+  S.budget=parseFloat(e.target.value);
+  if(S.routes.length)paintRoutes();
+};
+S.budget=0.10;
+S.budgetLen=L0=>S.budget>=1?Infinity:L0*(1+S.budget)+1e-9;
+$('btnClear').onclick=()=>{S.wps=[];S.routes=[];lay.corr.clearLayers();setMode('idle');refresh();
+  hint(T('已清空。重新点选端点。','Cleared. Pick new endpoints.'));};
+
+/* ---------- language ---------- */
+function applyLang(){
+  document.documentElement.lang=LANG==='en'?'en':'zh-CN';
+  document.querySelectorAll('[data-zh]').forEach(el=>{
+    el.textContent=LANG==='en'?(el.dataset.en||el.dataset.zh):el.dataset.zh;});
+  $('btnLang').textContent=LANG==='en'?'中文':'EN';
+  loadIndex();
+  if(S.site){paint(S.site);
+    $('siteNote').textContent=LANG==='en'?S.site.note_en:S.site.note;
+    $('siteName').textContent=LANG==='en'?S.site.name_en:S.site.name;
+    if(S.routes.length)paintRoutes(); else refresh();}
+}
+$('btnLang').onclick=()=>{
+  LANG=LANG==='en'?'zh':'en';
+  localStorage.setItem('qrite.lang',LANG);
+  applyLang();
+};
+
+/* ?site=north-dense&wps=lon,lat;lon,lat&auto=1 opens on a finished comparison,
+   which is also how a screenshot or a reviewer link is made */
+if(Q.get('shot'))document.body.classList.add('shot');
+
+loadIndex().then(async ()=>{
+  applyLang();
+  const want=Q.get('site');
+  const i=want?S.index.findIndex(s=>s.id===want):0;
+  await openSite(i>=0?i:0);
+  if(Q.get('wps')){
+    S.wps=Q.get('wps').split(';').map(t=>t.split(',').map(Number));
+    setMode('pick'); drawWps();
+    $('btnOpt').disabled=S.wps.length<2;
+    if(Q.get('auto'))setTimeout(optimise,400);
+  }
+  if(Q.get('shot')){
+    /* a headless window reports its size late, so refit twice: the first call
+       lands before layout, the second after the container has its real height */
+    const refit=()=>{ if(!S.site)return;
+      const s=S.site, b=L.latLngBounds([s.bbox[1],s.bbox[0]],[s.bbox[3],s.bbox[2]]);
+      map.invalidateSize(); map.fitBounds(b,{padding:[2,2]});
+      if(!S.routes.length)$('corrSect').style.display='none';
+    };
+    setTimeout(refit,900); setTimeout(refit,2400);
+  }
+});
+})();
+</script>
+</body>
+</html>
