@@ -1,5 +1,7 @@
 # Q-RITE — Qanat Shaft-Row Viewer
 
+[![DOI](https://zenodo.org/badge/1461542620.svg)](https://doi.org/10.5281/zenodo.24420360)
+
 An offline, interactive map of qanat (underground irrigation gallery) shaft rows and road crossings in the Turpan Basin, China. One page, five windows, no installation: **open `index.html` in a browser and it works.**
 
 ![Five-window viewer](sites/north-dense.jpg)
@@ -44,5 +46,17 @@ The legend at the top of the page names every symbol: bright-green dots are shaf
 ## Data & credits
 
 Shaft and row geometry is the detection/tracing output of the Q-RITE study. Imagery is a mosaic of Bing Maps tiles (© Microsoft); roads are from OpenStreetMap (© OpenStreetMap contributors, ODbL). The page redistributes only the derived vectors and the small image overlays needed for demonstration — see [TECHNICAL.md](TECHNICAL.md) for how it is built.
+
+## Cite this
+
+If you use this viewer or the layers it carries, cite the archived version of record:
+
+> Zhang, M. and Zhang, Y. (2026). Q-RITE: Qanat Shaft-Row Viewer (v1.0.1) [Software].
+> Zenodo. https://doi.org/10.5281/zenodo.24432398
+
+Machine-readable metadata is in [CITATION.cff](CITATION.cff); the licence split — code MIT,
+derived vectors CC BY 4.0, roads ODbL, imagery demonstration only — is in
+[LICENSE-DATA.md](LICENSE-DATA.md). The concept DOI `10.5281/zenodo.24420360` always resolves
+to the newest version; cite the version DOI when the numbers matter.
 
 [中文说明](README_zh.md) · [技术说明 / Technical notes](TECHNICAL.md)

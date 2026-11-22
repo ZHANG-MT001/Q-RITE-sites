@@ -1,5 +1,7 @@
 # Q-RITE · 坎儿井井链可视化平台
 
+[![DOI](https://zenodo.org/badge/1461542620.svg)](https://doi.org/10.5281/zenodo.24420360)
+
 一个离线交互地图：吐鲁番盆地五个窗口里的坎儿井井口、井链与道路交叉。不用安装、不用联网——**双击 `index.html` 就能看。**
 
 ![五窗口预览](sites/north-dense.jpg)
@@ -42,5 +44,16 @@ Q-RITE 绘制坎儿井井链及其与道路走廊的交叉。图上的井口来�
 ## 数据与署名
 
 井口与井链几何来自 Q-RITE 研究的检测/追踪结果；影像为 Bing Maps 瓦片拼接（© Microsoft）；道路来自 OpenStreetMap（© OpenStreetMap contributors, ODbL）。构建方式见[技术说明](TECHNICAL.md)。
+
+## 引用方式
+
+用到这个查看器或它带的图层，请引存档版本：
+
+> ZHANG M, ZHANG Y. Q-RITE: Qanat Shaft-Row Viewer: v1.0.1[CP/OL]. Zenodo,
+> 2026[2026-11-22]. https://doi.org/10.5281/zenodo.24432398.
+
+机器可读的题录见 [CITATION.cff](CITATION.cff)；许可分层见
+[LICENSE-DATA.md](LICENSE-DATA.md)（代码 MIT、派生矢量 CC BY 4.0、路网 ODbL、影像仅作演示）。
+概念 DOI `10.5281/zenodo.24420360` 永远指向最新版；要对数就引版本 DOI。
 
 [English README](README.md) · [技术说明 / Technical notes](TECHNICAL.md)
