@@ -14,8 +14,8 @@ The shaft points, the traced rows and the crossing table in `sites/` are
 derived products of the Q-RITE study. They are released under Creative Commons
 Attribution 4.0 International (CC BY 4.0). Cite as:
 
-> Zhang M. Q-RITE: Qanat Shaft-Row Viewer (v1.0.0) [Data and software]. 2026.
-> https://github.com/ZHANG-MT001/Q-RITE-sites
+> Zhang M., Zhang Y. Q-RITE: Qanat Shaft-Row Viewer (v1.0.1) [Data and software].
+> 2026. Zenodo. https://doi.org/10.5281/zenodo.24432398
 
 Two upstream obligations travel with these layers and must be kept in any
 redistribution:
