@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this viewer or the layers it carries, cite the version of record archived on Zenodo and the paper it accompanies."
+title: "Q-RITE: Qanat Shaft-Row Viewer"
+abstract: >-
+  An offline, single-page viewer of qanat shaft rows and the road corridors that
+  cross them in the Turpan Basin, China. Five windows of about 2.5 km on a side
+  carry the detected shaft mouths, the traced rows, the OpenStreetMap road
+  network, the road-row crossings, and a two-click alignment comparison that
+  returns the least-exposed route within a detour cap. The page needs no server
+  and no installation.
+type: software
+authors:
+  - family-names: Zhang
+    given-names: Mingtian
+    orcid: "https://orcid.org/0009-0008-3818-6820"
+    affiliation: "School of Civil and Environmental Engineering, Zhengzhou University of Aeronautics, Zhengzhou, China"
+  - family-names: Zhang
+    given-names: Yanfei
+    orcid: "https://orcid.org/0000-0001-6545-8432"
+    affiliation: "School of Civil and Environmental Engineering, Zhengzhou University of Aeronautics, Zhengzhou, China"
+version: 1.0.1
+date-released: "2026-11-22"
+doi: 10.5281/zenodo.24420360
+license: MIT
+repository-code: "https://github.com/ZHANG-MT001/Q-RITE-sites"
+url: "https://github.com/ZHANG-MT001/Q-RITE-sites"
+keywords:
+  - qanat
+  - karez
+  - shaft detection
+  - road corridor
+  - geometric exposure
+  - route selection
+  - Turpan
